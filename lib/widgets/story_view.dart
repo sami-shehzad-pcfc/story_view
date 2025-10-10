@@ -918,6 +918,7 @@ class StoryProgressIndicator extends StatelessWidget {
       foregroundPainter: IndicatorOval(
         this.indicatorForegroundColor ?? Colors.white.withValues(alpha: 0.8),
         this.value,
+        isLTR: isLTR,
       ),
       painter: IndicatorOval(
         this.indicatorColor ?? Colors.white.withValues(alpha: 0.4),
@@ -930,15 +931,19 @@ class StoryProgressIndicator extends StatelessWidget {
 class IndicatorOval extends CustomPainter {
   final Color color;
   final double widthFactor;
+  final bool isLTR;
 
-  IndicatorOval(this.color, this.widthFactor);
+  IndicatorOval(this.color, this.widthFactor, {this.isLTR = true});
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()..color = this.color;
     canvas.drawRRect(
         RRect.fromRectAndRadius(
-          Rect.fromLTWH(0, 0, size.width * this.widthFactor, size.height),
+          isLTR
+              ? Rect.fromLTWH(0, 0, size.width * this.widthFactor, size.height)
+              : Rect.fromLTWH(size.width - (size.width * this.widthFactor), 0,
+                  size.width * this.widthFactor, size.height),
           Radius.circular(4),
         ),
         paint);
