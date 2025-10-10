@@ -719,6 +719,7 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
                         .toList(),
                     this._currentAnimation,
                     key: UniqueKey(),
+                    isLTR: widget.isLTR,
                     indicatorHeight: widget.indicatorHeight,
                     indicatorColor: widget.indicatorColor,
                     indicatorForegroundColor: widget.indicatorForegroundColor,
