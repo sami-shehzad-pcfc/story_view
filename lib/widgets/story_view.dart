@@ -863,13 +863,15 @@ class PageBarState extends State<PageBar> {
   @override
   Widget build(BuildContext context) {
     return Row(
+      textDirection: widget.isLTR ? ui.TextDirection.ltr : ui.TextDirection.rtl,
       children: widget.pages.map((it) {
         return Expanded(
           child: Container(
             padding: EdgeInsets.only(
                 right: widget.pages.last == it ? 0 : this.spacing),
             child: Directionality(
-              textDirection: ui.TextDirection.ltr,
+              textDirection:
+                  widget.isLTR ? ui.TextDirection.ltr : ui.TextDirection.rtl,
               child: StoryProgressIndicator(
                 isPlaying(it) ? widget.animation!.value : (it.shown ? 1 : 0),
                 indicatorHeight: widget.indicatorHeight == IndicatorHeight.large
