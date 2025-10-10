@@ -175,7 +175,7 @@ class VideoContentView extends StatelessWidget {
             child: VideoPlayer(playerController!),
           ),
           Positioned(
-            top: MediaQuery.paddingOf(context).top + 150,
+            top: MediaQuery.paddingOf(context).top + 50,
             right: 20,
             child: GestureDetector(
               onTap: () {
