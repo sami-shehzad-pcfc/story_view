@@ -231,6 +231,7 @@ class StoryItem {
     Widget? caption,
     bool shown = false,
     Map<String, dynamic>? requestHeaders,
+    bool isMuteByDefault = true,
     Widget? loadingWidget,
     Widget? errorWidget,
   }) {
@@ -277,6 +278,7 @@ class StoryItem {
     BoxFit imageFit = BoxFit.fitWidth,
     Widget? caption,
     bool shown = false,
+    bool isMuteByDefault = true,
     Map<String, dynamic>? requestHeaders,
     Widget? loadingWidget,
     Widget? errorWidget,
@@ -293,6 +295,7 @@ class StoryItem {
                 requestHeaders: requestHeaders,
                 loadingWidget: loadingWidget,
                 errorWidget: errorWidget,
+                isMuteByDefault: isMuteByDefault,
               ),
               SafeArea(
                 child: Align(
@@ -852,7 +855,7 @@ class PageBarState extends State<PageBar> {
             child: StoryProgressIndicator(
               isPlaying(it) ? widget.animation!.value : (it.shown ? 1 : 0),
               indicatorHeight: widget.indicatorHeight == IndicatorHeight.large
-                  ? 6
+                  ? 8
                   : widget.indicatorHeight == IndicatorHeight.medium
                       ? 3
                       : 2,

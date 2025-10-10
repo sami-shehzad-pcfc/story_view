@@ -43,6 +43,7 @@ class StoryAssetsVideo extends StatefulWidget {
   final VideoLoader videoLoader;
   final Widget? loadingWidget;
   final Widget? errorWidget;
+  final bool isMuteByDefault;
 
   StoryAssetsVideo(
     this.videoLoader, {
@@ -50,6 +51,7 @@ class StoryAssetsVideo extends StatefulWidget {
     this.storyController,
     this.loadingWidget,
     this.errorWidget,
+    this.isMuteByDefault = true,
   }) : super(key: key ?? UniqueKey());
 
   static StoryAssetsVideo url(
@@ -57,6 +59,7 @@ class StoryAssetsVideo extends StatefulWidget {
     StoryController? controller,
     Map<String, dynamic>? requestHeaders,
     Key? key,
+    bool isMuteByDefault = true,
     Widget? loadingWidget,
     Widget? errorWidget,
   }) {
@@ -66,6 +69,7 @@ class StoryAssetsVideo extends StatefulWidget {
       key: key,
       loadingWidget: loadingWidget,
       errorWidget: errorWidget,
+      isMuteByDefault: isMuteByDefault,
     );
   }
 
@@ -90,12 +94,15 @@ class StoryAssetsVideoState extends State<StoryAssetsVideo> {
 
     widget.videoLoader.loadVideo(() {
       if (widget.videoLoader.state == LoadState.success) {
-        this.playerController =
-            VideoPlayerController.asset(widget.videoLoader.url);
+        this.playerController = VideoPlayerController.asset(
+          widget.videoLoader.url,
+          videoPlayerOptions: VideoPlayerOptions(),
+        );
 
         playerController!.initialize().then((v) {
           setState(() {});
           widget.storyController!.play();
+          playerController!.setVolume(widget.isMuteByDefault ? 0 : 1);
         });
 
         if (widget.storyController != null) {
@@ -160,9 +167,42 @@ class VideoContentView extends StatelessWidget {
     if (videoLoadState == LoadState.success &&
         playerController != null &&
         playerController!.value.isInitialized) {
-      return AspectRatio(
-        aspectRatio: playerController!.value.aspectRatio,
-        child: VideoPlayer(playerController!),
+      return Stack(
+        fit: StackFit.expand,
+        children: [
+          AspectRatio(
+            aspectRatio: playerController!.value.aspectRatio,
+            child: VideoPlayer(playerController!),
+          ),
+          Positioned(
+            top: MediaQuery.paddingOf(context).top + 150,
+            right: 20,
+            child: GestureDetector(
+              onTap: () {
+                if (playerController!.value.volume == 0) {
+                  playerController!.setVolume(1);
+                } else {
+                  playerController!.setVolume(0);
+                }
+              },
+              child: Container(
+                width: 32,
+                height: 32,
+                decoration: ShapeDecoration(
+                  shape: CircleBorder(),
+                  color: Colors.white.withValues(alpha: 0.2),
+                ),
+                child: Icon(
+                  playerController!.value.volume == 0
+                      ? Icons.volume_off_rounded
+                      : Icons.volume_up_rounded,
+                  size: 24,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ],
       );
     }
 
