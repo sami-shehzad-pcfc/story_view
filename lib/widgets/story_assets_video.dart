@@ -33,6 +33,7 @@ class VideoLoader {
     //     }
     //   }
     // });
+    this.state = LoadState.success;
     onComplete();
   }
 }
