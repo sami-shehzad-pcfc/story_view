@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:ui' as ui;
 
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/material.dart';
@@ -476,8 +477,7 @@ class StoryView extends StatefulWidget {
   /// Use this if you want to give outer padding to the indicator
   final EdgeInsetsGeometry indicatorOuterPadding;
 
-  final void Function(void Function(VideoPlayerController)? onPlayerLoaded)?
-      onPlayerLoaded;
+  final bool isLTR;
 
   StoryView({
     required this.storyItems,
@@ -491,7 +491,7 @@ class StoryView extends StatefulWidget {
     this.indicatorColor,
     this.indicatorForegroundColor,
     this.indicatorHeight = IndicatorHeight.large,
-    this.onPlayerLoaded,
+    this.isLTR = true,
     this.indicatorOuterPadding = const EdgeInsets.symmetric(
       horizontal: 16,
       vertical: 8,
@@ -597,10 +597,6 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
 
     if (widget.onStoryShow != null) {
       widget.onStoryShow!(storyItem, storyItemIndex);
-    }
-
-    if (storyItem.onPlayerLoaded != null) {
-      widget.onPlayerLoaded?.call(storyItem.onPlayerLoaded);
     }
 
     _animationController =
@@ -820,6 +816,7 @@ class PageBar extends StatefulWidget {
   final IndicatorHeight indicatorHeight;
   final Color? indicatorColor;
   final Color? indicatorForegroundColor;
+  final bool isLTR;
 
   PageBar(
     this.pages,
@@ -827,6 +824,7 @@ class PageBar extends StatefulWidget {
     this.indicatorHeight = IndicatorHeight.large,
     this.indicatorColor,
     this.indicatorForegroundColor,
+    this.isLTR = true,
     Key? key,
   }) : super(key: key);
 
@@ -870,15 +868,18 @@ class PageBarState extends State<PageBar> {
           child: Container(
             padding: EdgeInsets.only(
                 right: widget.pages.last == it ? 0 : this.spacing),
-            child: StoryProgressIndicator(
-              isPlaying(it) ? widget.animation!.value : (it.shown ? 1 : 0),
-              indicatorHeight: widget.indicatorHeight == IndicatorHeight.large
-                  ? 8
-                  : widget.indicatorHeight == IndicatorHeight.medium
-                      ? 3
-                      : 2,
-              indicatorColor: widget.indicatorColor,
-              indicatorForegroundColor: widget.indicatorForegroundColor,
+            child: Directionality(
+              textDirection: ui.TextDirection.ltr,
+              child: StoryProgressIndicator(
+                isPlaying(it) ? widget.animation!.value : (it.shown ? 1 : 0),
+                indicatorHeight: widget.indicatorHeight == IndicatorHeight.large
+                    ? 8
+                    : widget.indicatorHeight == IndicatorHeight.medium
+                        ? 3
+                        : 2,
+                indicatorColor: widget.indicatorColor,
+                indicatorForegroundColor: widget.indicatorForegroundColor,
+              ),
             ),
           ),
         );
@@ -895,12 +896,14 @@ class StoryProgressIndicator extends StatelessWidget {
   final double indicatorHeight;
   final Color? indicatorColor;
   final Color? indicatorForegroundColor;
+  final bool isLTR;
 
   StoryProgressIndicator(
     this.value, {
     this.indicatorHeight = 5,
     this.indicatorColor,
     this.indicatorForegroundColor,
+    this.isLTR = true,
   });
 
   @override
