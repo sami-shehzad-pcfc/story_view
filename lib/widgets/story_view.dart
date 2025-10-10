@@ -870,19 +870,16 @@ class PageBarState extends State<PageBar> {
           child: Container(
             padding: EdgeInsets.only(
                 right: widget.pages.last == it ? 0 : this.spacing),
-            child: Directionality(
-              textDirection:
-                  widget.isLTR ? ui.TextDirection.ltr : ui.TextDirection.rtl,
-              child: StoryProgressIndicator(
-                isPlaying(it) ? widget.animation!.value : (it.shown ? 1 : 0),
-                indicatorHeight: widget.indicatorHeight == IndicatorHeight.large
-                    ? 8
-                    : widget.indicatorHeight == IndicatorHeight.medium
-                        ? 3
-                        : 2,
-                indicatorColor: widget.indicatorColor,
-                indicatorForegroundColor: widget.indicatorForegroundColor,
-              ),
+            child: StoryProgressIndicator(
+              isPlaying(it) ? widget.animation!.value : (it.shown ? 1 : 0),
+              indicatorHeight: widget.indicatorHeight == IndicatorHeight.large
+                  ? 8
+                  : widget.indicatorHeight == IndicatorHeight.medium
+                      ? 3
+                      : 2,
+              indicatorColor: widget.indicatorColor,
+              indicatorForegroundColor: widget.indicatorForegroundColor,
+              isLTR: widget.isLTR,
             ),
           ),
         );
