@@ -183,7 +183,7 @@ class _VideoContentViewState extends State<VideoContentView> {
             child: VideoPlayer(widget.playerController!),
           ),
           Positioned(
-            top: MediaQuery.paddingOf(context).top + 50,
+            top: MediaQuery.paddingOf(context).top + 40,
             right: 20,
             child: GestureDetector(
               onTap: () {
