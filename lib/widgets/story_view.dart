@@ -729,7 +729,7 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
             ),
           ),
           Align(
-              alignment: Alignment.centerRight,
+              alignment: AlignmentDirectional.centerEnd,
               child: SizedBox(
                 width: 70,
                 height: 600,
@@ -785,7 +785,7 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
                 ),
               )),
           Align(
-            alignment: Alignment.centerLeft,
+            alignment: AlignmentDirectional.centerStart,
             child: SizedBox(
               child: GestureDetector(onTap: () {
                 widget.controller.previous();
