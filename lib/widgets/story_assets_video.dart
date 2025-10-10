@@ -160,11 +160,9 @@ class VideoContentView extends StatelessWidget {
     if (videoLoadState == LoadState.success &&
         playerController != null &&
         playerController!.value.isInitialized) {
-      return Center(
-        child: AspectRatio(
-          aspectRatio: playerController!.value.aspectRatio,
-          child: VideoPlayer(playerController!),
-        ),
+      return AspectRatio(
+        aspectRatio: playerController!.value.aspectRatio,
+        child: VideoPlayer(playerController!),
       );
     }
 
