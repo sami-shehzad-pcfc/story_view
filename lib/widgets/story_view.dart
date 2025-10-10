@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:math';
-import 'dart:nativewrappers/_internal/vm/lib/ffi_allocation_patch.dart';
 
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/material.dart';
@@ -477,7 +476,8 @@ class StoryView extends StatefulWidget {
   /// Use this if you want to give outer padding to the indicator
   final EdgeInsetsGeometry indicatorOuterPadding;
 
-  final void Function(VideoPlayerController)? onPlayerLoaded;
+  final void Function(void Function(VideoPlayerController)? onPlayerLoaded)?
+      onPlayerLoaded;
 
   StoryView({
     required this.storyItems,
@@ -600,7 +600,7 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
     }
 
     if (storyItem.onPlayerLoaded != null) {
-      widget.onPlayerLoaded?.call(storyItem.onPlayerLoaded.call());
+      widget.onPlayerLoaded?.call(storyItem.onPlayerLoaded);
     }
 
     _animationController =
