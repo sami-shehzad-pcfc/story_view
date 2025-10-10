@@ -175,9 +175,44 @@ class _VideoContentViewState extends State<VideoContentView> {
     if (widget.videoLoadState == LoadState.success &&
         widget.playerController != null &&
         widget.playerController!.value.isInitialized) {
-      return AspectRatio(
-        aspectRatio: widget.playerController!.value.aspectRatio,
-        child: VideoPlayer(widget.playerController!),
+      return Stack(
+        fit: StackFit.expand,
+        children: [
+          AspectRatio(
+            aspectRatio: widget.playerController!.value.aspectRatio,
+            child: VideoPlayer(widget.playerController!),
+          ),
+          Positioned(
+            top: MediaQuery.paddingOf(context).top + 50,
+            right: 20,
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  if (widget.playerController!.value.volume == 0) {
+                    widget.playerController!.setVolume(1);
+                  } else {
+                    widget.playerController!.setVolume(0);
+                  }
+                });
+              },
+              child: Container(
+                width: 32,
+                height: 32,
+                decoration: ShapeDecoration(
+                  shape: CircleBorder(),
+                  color: Colors.white.withValues(alpha: 0.2),
+                ),
+                child: Icon(
+                  widget.playerController!.value.volume == 0
+                      ? Icons.volume_off_rounded
+                      : Icons.volume_up_rounded,
+                  size: 24,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ],
       );
     }
 
