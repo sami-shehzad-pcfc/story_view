@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:nativewrappers/_internal/vm/lib/ffi_allocation_patch.dart';
 
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/material.dart';
@@ -36,10 +37,13 @@ class StoryItem {
 
   /// The page content
   final Widget view;
+
+  final void Function(VideoPlayerController)? onPlayerLoaded;
   StoryItem(
     this.view, {
     required this.duration,
     this.shown = false,
+    this.onPlayerLoaded,
   });
 
   /// Short hand to create text-only page.
@@ -286,38 +290,38 @@ class StoryItem {
     Function(VideoPlayerController)? onPlayerLoaded,
   }) {
     return StoryItem(
-        Container(
-          key: key,
-          color: Colors.black,
-          child: Stack(
-            children: <Widget>[
-              StoryAssetsVideo.url(
-                url,
-                controller: controller,
-                requestHeaders: requestHeaders,
-                loadingWidget: loadingWidget,
-                errorWidget: errorWidget,
-                isMuteByDefault: isMuteByDefault,
-                onPlayerLoaded: onPlayerLoaded,
-              ),
-              SafeArea(
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Container(
-                    width: double.infinity,
-                    margin: EdgeInsets.only(bottom: 24),
-                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                    color:
-                        caption != null ? Colors.black54 : Colors.transparent,
-                    child: caption ?? const SizedBox.shrink(),
-                  ),
+      Container(
+        key: key,
+        color: Colors.black,
+        child: Stack(
+          children: <Widget>[
+            StoryAssetsVideo.url(
+              url,
+              controller: controller,
+              requestHeaders: requestHeaders,
+              loadingWidget: loadingWidget,
+              errorWidget: errorWidget,
+              isMuteByDefault: isMuteByDefault,
+            ),
+            SafeArea(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  width: double.infinity,
+                  margin: EdgeInsets.only(bottom: 24),
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                  color: caption != null ? Colors.black54 : Colors.transparent,
+                  child: caption ?? const SizedBox.shrink(),
                 ),
-              )
-            ],
-          ),
+              ),
+            )
+          ],
         ),
-        shown: shown,
-        duration: duration ?? Duration(seconds: 10));
+      ),
+      shown: shown,
+      duration: duration ?? Duration(seconds: 10),
+      onPlayerLoaded: onPlayerLoaded,
+    );
   }
 
   /// Shorthand for creating a story item from an image provider such as `AssetImage`
@@ -473,6 +477,8 @@ class StoryView extends StatefulWidget {
   /// Use this if you want to give outer padding to the indicator
   final EdgeInsetsGeometry indicatorOuterPadding;
 
+  final void Function(VideoPlayerController)? onPlayerLoaded;
+
   StoryView({
     required this.storyItems,
     required this.controller,
@@ -485,6 +491,7 @@ class StoryView extends StatefulWidget {
     this.indicatorColor,
     this.indicatorForegroundColor,
     this.indicatorHeight = IndicatorHeight.large,
+    this.onPlayerLoaded,
     this.indicatorOuterPadding = const EdgeInsets.symmetric(
       horizontal: 16,
       vertical: 8,
@@ -590,6 +597,10 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
 
     if (widget.onStoryShow != null) {
       widget.onStoryShow!(storyItem, storyItemIndex);
+    }
+
+    if (storyItem.onPlayerLoaded != null) {
+      widget.onPlayerLoaded?.call(storyItem.onPlayerLoaded.call());
     }
 
     _animationController =
