@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 
 import '../controller/story_controller.dart';
 import '../utils.dart';
@@ -282,6 +283,7 @@ class StoryItem {
     Map<String, dynamic>? requestHeaders,
     Widget? loadingWidget,
     Widget? errorWidget,
+    Function(VideoPlayerController)? onPlayerLoaded,
   }) {
     return StoryItem(
         Container(
@@ -296,6 +298,7 @@ class StoryItem {
                 loadingWidget: loadingWidget,
                 errorWidget: errorWidget,
                 isMuteByDefault: isMuteByDefault,
+                onPlayerLoaded: onPlayerLoaded,
               ),
               SafeArea(
                 child: Align(
@@ -691,6 +694,32 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
       color: Colors.white,
       child: Stack(
         children: <Widget>[
+          _currentView,
+          Visibility(
+            visible: widget.progressPosition != ProgressPosition.none,
+            child: Align(
+              alignment: widget.progressPosition == ProgressPosition.top
+                  ? Alignment.topCenter
+                  : Alignment.bottomCenter,
+              child: SafeArea(
+                bottom: widget.inline ? false : true,
+                // we use SafeArea here for notched and bezeles phones
+                child: Container(
+                  padding: widget.indicatorOuterPadding,
+                  child: PageBar(
+                    widget.storyItems
+                        .map((it) => PageData(it!.duration, it.shown))
+                        .toList(),
+                    this._currentAnimation,
+                    key: UniqueKey(),
+                    indicatorHeight: widget.indicatorHeight,
+                    indicatorColor: widget.indicatorColor,
+                    indicatorForegroundColor: widget.indicatorForegroundColor,
+                  ),
+                ),
+              ),
+            ),
+          ),
           Align(
               alignment: Alignment.centerRight,
               heightFactor: 1,
@@ -755,32 +784,6 @@ class StoryViewState extends State<StoryView> with TickerProviderStateMixin {
                   widget.controller.previous();
                 }),
                 width: 70),
-          ),
-          _currentView,
-          Visibility(
-            visible: widget.progressPosition != ProgressPosition.none,
-            child: Align(
-              alignment: widget.progressPosition == ProgressPosition.top
-                  ? Alignment.topCenter
-                  : Alignment.bottomCenter,
-              child: SafeArea(
-                bottom: widget.inline ? false : true,
-                // we use SafeArea here for notched and bezeles phones
-                child: Container(
-                  padding: widget.indicatorOuterPadding,
-                  child: PageBar(
-                    widget.storyItems
-                        .map((it) => PageData(it!.duration, it.shown))
-                        .toList(),
-                    this._currentAnimation,
-                    key: UniqueKey(),
-                    indicatorHeight: widget.indicatorHeight,
-                    indicatorColor: widget.indicatorColor,
-                    indicatorForegroundColor: widget.indicatorForegroundColor,
-                  ),
-                ),
-              ),
-            ),
           ),
         ],
       ),
