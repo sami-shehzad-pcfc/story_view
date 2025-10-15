@@ -252,6 +252,7 @@ class StoryItem {
                 requestHeaders: requestHeaders,
                 loadingWidget: loadingWidget,
                 errorWidget: errorWidget,
+                isMuteByDefault: isMuteByDefault,
               ),
               SafeArea(
                 child: Align(

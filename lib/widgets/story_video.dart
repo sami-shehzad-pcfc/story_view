@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:video_player/video_player.dart';
 
-import '../utils.dart';
 import '../controller/story_controller.dart';
+import '../utils.dart';
 
 class VideoLoader {
   String url;
@@ -25,8 +25,8 @@ class VideoLoader {
       onComplete();
     }
 
-    final fileStream = DefaultCacheManager()
-        .getFileStream(this.url, headers: this.requestHeaders as Map<String, String>?);
+    final fileStream = DefaultCacheManager().getFileStream(this.url,
+        headers: this.requestHeaders as Map<String, String>?);
 
     fileStream.listen((fileResponse) {
       if (fileResponse is FileInfo) {
@@ -45,19 +45,24 @@ class StoryVideo extends StatefulWidget {
   final VideoLoader videoLoader;
   final Widget? loadingWidget;
   final Widget? errorWidget;
+  final bool isMuteByDefault;
 
-  StoryVideo(this.videoLoader, {
+  StoryVideo(
+    this.videoLoader, {
     Key? key,
     this.storyController,
     this.loadingWidget,
     this.errorWidget,
+    this.isMuteByDefault = true,
   }) : super(key: key ?? UniqueKey());
 
-  static StoryVideo url(String url, {
+  static StoryVideo url(
+    String url, {
     StoryController? controller,
     Map<String, dynamic>? requestHeaders,
     Key? key,
     Widget? loadingWidget,
+    bool isMuteByDefault = true,
     Widget? errorWidget,
   }) {
     return StoryVideo(
@@ -65,6 +70,7 @@ class StoryVideo extends StatefulWidget {
       storyController: controller,
       key: key,
       loadingWidget: loadingWidget,
+      isMuteByDefault: isMuteByDefault,
       errorWidget: errorWidget,
     );
   }
@@ -96,6 +102,7 @@ class StoryVideoState extends State<StoryVideo> {
         playerController!.initialize().then((v) {
           setState(() {});
           widget.storyController!.play();
+          playerController!.setVolume(widget.isMuteByDefault ? 0 : 1);
         });
 
         if (widget.storyController != null) {
@@ -141,7 +148,7 @@ class StoryVideoState extends State<StoryVideo> {
  * @name VideoContentView
  * @description Stateless widget that shows a video player or loading/error widgets based on video loading state.
  */
-class VideoContentView extends StatelessWidget {
+class VideoContentView extends StatefulWidget {
   final LoadState videoLoadState;
   final VideoPlayerController? playerController;
   final Widget? loadingWidget;
@@ -156,21 +163,59 @@ class VideoContentView extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<VideoContentView> createState() => _VideoContentViewState();
+}
+
+class _VideoContentViewState extends State<VideoContentView> {
+  @override
   Widget build(BuildContext context) {
-    if (videoLoadState == LoadState.success &&
-        playerController != null &&
-        playerController!.value.isInitialized) {
-      return Center(
-        child: AspectRatio(
-          aspectRatio: playerController!.value.aspectRatio,
-          child: VideoPlayer(playerController!),
-        ),
+    if (widget.videoLoadState == LoadState.success &&
+        widget.playerController != null &&
+        widget.playerController!.value.isInitialized) {
+      return Stack(
+        fit: StackFit.expand,
+        children: [
+          AspectRatio(
+            aspectRatio: widget.playerController!.value.aspectRatio,
+            child: VideoPlayer(widget.playerController!),
+          ),
+          Positioned(
+            top: MediaQuery.paddingOf(context).top + 40,
+            right: 20,
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  if (widget.playerController!.value.volume == 0) {
+                    widget.playerController!.setVolume(1);
+                  } else {
+                    widget.playerController!.setVolume(0);
+                  }
+                });
+              },
+              child: Container(
+                width: 32,
+                height: 32,
+                decoration: ShapeDecoration(
+                  shape: CircleBorder(),
+                  color: Colors.white.withValues(alpha: 0.2),
+                ),
+                child: Icon(
+                  widget.playerController!.value.volume == 0
+                      ? Icons.volume_off_rounded
+                      : Icons.volume_up_rounded,
+                  size: 24,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ],
       );
     }
 
-    if (videoLoadState == LoadState.loading) {
+    if (widget.videoLoadState == LoadState.loading) {
       return Center(
-        child: loadingWidget ??
+        child: widget.loadingWidget ??
             const SizedBox(
               width: 70,
               height: 70,
@@ -183,7 +228,7 @@ class VideoContentView extends StatelessWidget {
     }
 
     return Center(
-      child: errorWidget ??
+      child: widget.errorWidget ??
           const Text(
             "Media failed to load.",
             style: TextStyle(color: Colors.white),
