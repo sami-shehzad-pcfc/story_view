@@ -1,3 +1,4 @@
+import 'package:cached_video_player_plus/cached_video_player_plus.dart';
 import 'package:rxdart/rxdart.dart';
 
 enum PlaybackState { pause, play, next, previous }
@@ -10,6 +11,14 @@ enum PlaybackState { pause, play, next, previous }
 class StoryController {
   /// Stream that broadcasts the playback state of the stories.
   final playbackNotifier = BehaviorSubject<PlaybackState>();
+
+  Future<void> precacheVideo(String url, String? key) async {
+    await CachedVideoPlayerPlus.preCacheVideo(
+      Uri.parse(url),
+      cacheKey: key,
+      invalidateCacheIfOlderThan: const Duration(days: 7),
+    );
+  }
 
   /// Notify listeners with a [PlaybackState.pause] state
   void pause() {

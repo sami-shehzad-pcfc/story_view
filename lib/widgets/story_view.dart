@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/material.dart';
+import 'package:story_view/widgets/story_cached_video.dart';
 import 'package:video_player/video_player.dart';
 
 import '../controller/story_controller.dart';
@@ -23,7 +24,7 @@ enum IndicatorHeight { small, medium, large }
 class StoryItem {
   /// Specifies how long the page should be displayed. It should be a reasonable
   /// amount of time greater than 0 milliseconds.
-  final Duration duration;
+  Duration duration;
 
   /// Has this page been shown already? This is used to indicate that the page
   /// has been displayed. If some pages are supposed to be skipped in a story,
@@ -38,12 +39,15 @@ class StoryItem {
   /// The page content
   final Widget view;
 
+  final void Function(Duration)? onDurationLoaded;
+
   final void Function(VideoPlayerController)? onPlayerLoaded;
   StoryItem(
     this.view, {
     required this.duration,
     this.shown = false,
     this.onPlayerLoaded,
+    this.onDurationLoaded,
   });
 
   /// Short hand to create text-only page.
@@ -272,6 +276,59 @@ class StoryItem {
         ),
         shown: shown,
         duration: duration ?? Duration(seconds: 10));
+  }
+
+  /// Shorthand for creating page cached video. [controller] should be same instance as
+  /// one passed to the `StoryView`
+  factory StoryItem.pageCacheVideo(
+    String url, {
+    required StoryController controller,
+    Key? key,
+    Duration? duration,
+    BoxFit imageFit = BoxFit.fitWidth,
+    Widget? caption,
+    bool shown = false,
+    Map<String, dynamic>? requestHeaders,
+    bool isMuteByDefault = true,
+    Widget? loadingWidget,
+    Widget? errorWidget,
+    void Function(Duration duration)? onDurationLoaded,
+  }) {
+    return StoryItem(
+      Container(
+        key: key,
+        color: Colors.black,
+        child: Stack(
+          children: <Widget>[
+            StoryCacheVideo.url(
+              url,
+              controller: controller,
+              requestHeaders: requestHeaders,
+              loadingWidget: loadingWidget,
+              errorWidget: errorWidget,
+              isMuteByDefault: isMuteByDefault,
+              onDurationLoaded: (durationV) {
+                duration = durationV;
+              },
+            ),
+            SafeArea(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  width: double.infinity,
+                  margin: EdgeInsets.only(bottom: 24),
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                  color: caption != null ? Colors.black54 : Colors.transparent,
+                  child: caption ?? const SizedBox.shrink(),
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+      shown: shown,
+      duration: duration ?? Duration(seconds: 10),
+    );
   }
 
   /// Shorthand for creating asset page video. [controller] should be same instance as
