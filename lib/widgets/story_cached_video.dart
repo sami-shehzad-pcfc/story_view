@@ -100,13 +100,13 @@ class StoryCacheVideoState extends State<StoryCacheVideo> {
 
     widget.storyController!.pause();
 
+    playerController = CachedVideoPlayerPlus.networkUrl(
+      Uri.parse(widget.videoLoader.url),
+      invalidateCacheIfOlderThan: Duration(days: 2),
+    );
+
     widget.videoLoader.loadVideo(() {
       if (widget.videoLoader.state == LoadState.success) {
-        this.playerController = CachedVideoPlayerPlus.networkUrl(
-          Uri.parse(widget.videoLoader.url),
-          invalidateCacheIfOlderThan: Duration(days: 2),
-        );
-
         playerController!.initialize().then((v) {
           setState(() {});
           widget.onDurationLoaded

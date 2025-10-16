@@ -14,3 +14,9 @@ dependencies:
   video_player: ^2.10.0
   collection: ^1.19.1
   cached_video_player_plus: ^4.0.4
+
+dependency_overrides:
+  flutter_cache_manager:
+    git:
+      url: https://github.com/Oliver-WJ/flutter_cache_manager.git
+      path: flutter_cache_manager
