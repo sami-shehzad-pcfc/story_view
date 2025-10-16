@@ -15,7 +15,7 @@ class StoryController {
   Future<void> precacheVideo(String url) async {
     await CachedVideoPlayerPlus.preCacheVideo(
       Uri.parse(url),
-      invalidateCacheIfOlderThan: const Duration(days: 3),
+      invalidateCacheIfOlderThan: const Duration(minutes: 5),
     );
   }
 
