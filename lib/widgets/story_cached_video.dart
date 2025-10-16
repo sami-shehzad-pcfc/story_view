@@ -138,12 +138,14 @@ class StoryCacheVideoState extends State<StoryCacheVideo> {
       color: Colors.black,
       height: double.infinity,
       width: double.infinity,
-      child: VideoContentView(
-        videoLoadState: widget.videoLoader.state,
-        playerController: playerController,
-        loadingWidget: widget.loadingWidget,
-        errorWidget: widget.errorWidget,
-      ),
+      child: (playerController?.isInitialized ?? false)
+          ? VideoContentView(
+              videoLoadState: widget.videoLoader.state,
+              controller: playerController!.controller,
+              loadingWidget: widget.loadingWidget,
+              errorWidget: widget.errorWidget,
+            )
+          : SizedBox(),
     );
   }
 
@@ -161,14 +163,14 @@ class StoryCacheVideoState extends State<StoryCacheVideo> {
  */
 class VideoContentView extends StatefulWidget {
   final LoadState videoLoadState;
-  final CachedVideoPlayerPlus? playerController;
+  final VideoPlayerController? controller;
   final Widget? loadingWidget;
   final Widget? errorWidget;
 
   const VideoContentView({
     Key? key,
     required this.videoLoadState,
-    required this.playerController,
+    required this.controller,
     this.loadingWidget,
     this.errorWidget,
   }) : super(key: key);
@@ -181,14 +183,14 @@ class _VideoContentViewState extends State<VideoContentView> {
   @override
   Widget build(BuildContext context) {
     if (widget.videoLoadState == LoadState.success &&
-        widget.playerController != null &&
-        widget.playerController!.controller.value.isInitialized) {
+        widget.controller != null &&
+        widget.controller!.value.isInitialized) {
       return Stack(
         fit: StackFit.expand,
         children: [
           AspectRatio(
-            aspectRatio: widget.playerController!.controller.value.aspectRatio,
-            child: VideoPlayer(widget.playerController!.controller),
+            aspectRatio: widget.controller!.value.aspectRatio,
+            child: VideoPlayer(widget.controller!),
           ),
           Positioned(
             top: MediaQuery.paddingOf(context).top + 40,
@@ -196,10 +198,10 @@ class _VideoContentViewState extends State<VideoContentView> {
             child: GestureDetector(
               onTap: () {
                 setState(() {
-                  if (widget.playerController!.controller.value.volume == 0) {
-                    widget.playerController!.controller.setVolume(1);
+                  if (widget.controller!.value.volume == 0) {
+                    widget.controller!.setVolume(1);
                   } else {
-                    widget.playerController!.controller.setVolume(0);
+                    widget.controller!.setVolume(0);
                   }
                 });
               },
@@ -211,7 +213,7 @@ class _VideoContentViewState extends State<VideoContentView> {
                   color: Colors.white.withValues(alpha: 0.2),
                 ),
                 child: Icon(
-                  widget.playerController!.controller.value.volume == 0
+                  widget.controller!.value.volume == 0
                       ? Icons.volume_off_rounded
                       : Icons.volume_up_rounded,
                   size: 24,
