@@ -98,8 +98,6 @@ class StoryCacheVideoState extends State<StoryCacheVideo> {
   void initState() {
     super.initState();
 
-    widget.storyController!.pause();
-
     playerController = CachedVideoPlayerPlus.networkUrl(
       Uri.parse(widget.videoLoader.url),
       invalidateCacheIfOlderThan: Duration(days: 3),
@@ -107,6 +105,7 @@ class StoryCacheVideoState extends State<StoryCacheVideo> {
 
     widget.videoLoader.loadVideo(() {
       if (widget.videoLoader.state == LoadState.success) {
+        widget.storyController!.pause();
         playerController!.initialize().then((v) {
           setState(() {});
           widget.onDurationLoaded
@@ -114,18 +113,18 @@ class StoryCacheVideoState extends State<StoryCacheVideo> {
           widget.storyController!.play();
           playerController!.controller
               .setVolume(widget.isMuteByDefault ? 0 : 1);
-        });
 
-        if (widget.storyController != null) {
-          _streamSubscription =
-              widget.storyController!.playbackNotifier.listen((playbackState) {
-            if (playbackState == PlaybackState.pause) {
-              playerController!.controller.pause();
-            } else {
-              playerController!.controller.play();
-            }
-          });
-        }
+          if (widget.storyController != null) {
+            _streamSubscription = widget.storyController!.playbackNotifier
+                .listen((playbackState) {
+              if (playbackState == PlaybackState.pause) {
+                playerController!.controller.pause();
+              } else {
+                playerController!.controller.play();
+              }
+            });
+          }
+        });
       } else {
         setState(() {});
       }
