@@ -12,11 +12,10 @@ class StoryController {
   /// Stream that broadcasts the playback state of the stories.
   final playbackNotifier = BehaviorSubject<PlaybackState>();
 
-  Future<void> precacheVideo(String url, String? key) async {
+  Future<void> precacheVideo(String url) async {
     await CachedVideoPlayerPlus.preCacheVideo(
       Uri.parse(url),
-      cacheKey: key,
-      invalidateCacheIfOlderThan: const Duration(days: 7),
+      invalidateCacheIfOlderThan: const Duration(days: 3),
     );
   }
 
