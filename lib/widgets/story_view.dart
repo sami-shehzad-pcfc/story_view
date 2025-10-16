@@ -307,9 +307,7 @@ class StoryItem {
               loadingWidget: loadingWidget,
               errorWidget: errorWidget,
               isMuteByDefault: isMuteByDefault,
-              onDurationLoaded: (durationV) {
-                duration = durationV;
-              },
+              onDurationLoaded: onDurationLoaded,
             ),
             SafeArea(
               child: Align(
@@ -328,6 +326,9 @@ class StoryItem {
       ),
       shown: shown,
       duration: duration ?? Duration(seconds: 10),
+      onDurationLoaded: (durationV) {
+        duration = durationV;
+      },
     );
   }
 
